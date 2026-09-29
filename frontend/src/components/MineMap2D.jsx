@@ -1,7 +1,9 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { ZoomIn, ZoomOut, RotateCcw, MapPin } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function MineMap2D({ telemetry, events }) {
+  const { t } = useLanguage();
   const canvasRef = useRef(null);
   const animFrameRef = useRef(null);
   const [zoom, setZoom] = useState(1.0);
@@ -25,15 +27,15 @@ export default function MineMap2D({ telemetry, events }) {
       const width = canvas.width;
       const height = canvas.height;
 
-      // Clear background
-      ctx.fillStyle = '#06090e';
+      // Clear background - deep obsidian
+      ctx.fillStyle = '#030508';
       ctx.fillRect(0, 0, width, height);
 
       ctx.save();
       ctx.scale(zoom, zoom);
 
       // 1. Grid Layout
-      ctx.strokeStyle = '#121d2e';
+      ctx.strokeStyle = 'rgba(34, 197, 94, 0.08)';
       ctx.lineWidth = 1;
       const gridSize = 30;
       for (let x = 0; x < width; x += gridSize) {
@@ -56,32 +58,32 @@ export default function MineMap2D({ telemetry, events }) {
         for (let i = 1; i < t.points.length; i++) {
           ctx.lineTo(t.points[i][0], t.points[i][1]);
         }
-        ctx.lineWidth = 28;
-        ctx.strokeStyle = '#0f1726';
+        ctx.lineWidth = 30;
+        ctx.strokeStyle = '#0a1017';
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         ctx.stroke();
 
         ctx.lineWidth = 2;
-        ctx.strokeStyle = '#263b5c';
+        ctx.strokeStyle = 'rgba(34, 197, 94, 0.25)';
         ctx.stroke();
       });
 
       // 3. Hazard Zones & Trapped Worker Markers
-      ctx.fillStyle = 'rgba(255, 59, 48, 0.15)';
+      ctx.fillStyle = 'rgba(239, 68, 68, 0.18)';
       ctx.beginPath(); ctx.arc(124, 82, 35, 0, 2 * Math.PI); ctx.fill();
-      ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255, 59, 48, 0.6)'; ctx.stroke();
+      ctx.lineWidth = 1.5; ctx.strokeStyle = 'rgba(239, 68, 68, 0.7)'; ctx.stroke();
 
-      ctx.fillStyle = '#ff3b30';
-      ctx.font = '11px monospace';
-      ctx.fillText('HAZARD: GAS & HEAT SPIKE', 70, 42);
+      ctx.fillStyle = '#f87171';
+      ctx.font = 'bold 11px monospace';
+      ctx.fillText(t('hazardGasHeat'), 70, 42);
 
-      ctx.fillStyle = 'rgba(0, 240, 255, 0.2)';
+      ctx.fillStyle = 'rgba(34, 197, 94, 0.18)';
       ctx.beginPath(); ctx.arc(156, 110, 25, 0, 2 * Math.PI); ctx.fill();
 
-      ctx.fillStyle = '#00f0ff';
-      ctx.font = '11px monospace';
-      ctx.fillText('TRAPPED WORKER CONFIRMED (36.8°C)', 160, 102);
+      ctx.fillStyle = '#4ade80';
+      ctx.font = 'bold 11px monospace';
+      ctx.fillText(t('workerConfirmed'), 160, 102);
 
       // 4. Trajectory Path
       if (pathHistory.length > 1) {
@@ -90,7 +92,7 @@ export default function MineMap2D({ telemetry, events }) {
         for (let i = 1; i < pathHistory.length; i++) {
           ctx.lineTo(pathHistory[i].x, pathHistory[i].y);
         }
-        ctx.strokeStyle = '#00f0ff';
+        ctx.strokeStyle = '#22c55e';
         ctx.lineWidth = 2.5;
         ctx.setLineDash([4, 4]);
         ctx.stroke();
@@ -101,11 +103,11 @@ export default function MineMap2D({ telemetry, events }) {
       const rx = telemetry?.location?.x || 120;
       const ry = telemetry?.location?.y || 80;
 
-      ctx.fillStyle = 'rgba(0, 230, 118, 0.25)';
-      ctx.beginPath(); ctx.arc(rx, ry, 16, 0, 2 * Math.PI); ctx.fill();
+      ctx.fillStyle = 'rgba(34, 197, 94, 0.3)';
+      ctx.beginPath(); ctx.arc(rx, ry, 18, 0, 2 * Math.PI); ctx.fill();
 
-      ctx.fillStyle = '#00e676';
-      ctx.beginPath(); ctx.arc(rx, ry, 7, 0, 2 * Math.PI); ctx.fill();
+      ctx.fillStyle = '#22c55e';
+      ctx.beginPath(); ctx.arc(rx, ry, 8, 0, 2 * Math.PI); ctx.fill();
       ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.stroke();
 
       ctx.beginPath();
@@ -113,81 +115,71 @@ export default function MineMap2D({ telemetry, events }) {
       ctx.lineTo(rx - 5, ry - 6);
       ctx.lineTo(rx + 5, ry - 6);
       ctx.closePath();
-      ctx.fillStyle = '#00e676';
+      ctx.fillStyle = '#4ade80';
       ctx.fill();
 
       ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 11px monospace';
+      ctx.font = 'bold 10px monospace';
       ctx.fillText('ROVER-01', rx - 24, ry + 22);
 
       ctx.restore();
     };
 
-    animFrameRef.current = window.requestAnimationFrame(renderCanvas);
-    return () => {
-      if (animFrameRef.current) window.cancelAnimationFrame(animFrameRef.current);
-    };
-  }, [telemetry?.location?.x, telemetry?.location?.y, zoom, pathHistory]);
-
-  const locX = telemetry?.location?.x || 120;
-  const locY = telemetry?.location?.y || 80;
-  const tunnelId = telemetry?.location?.tunnel_id || 'Tunnel A';
+    renderCanvas();
+  }, [telemetry, zoom, pathHistory, t]);
 
   return (
-    <div className="control-card p-3">
+    <div className="control-card p-3 h-100">
       <div className="d-flex align-items-center justify-content-between mb-2">
-        <div className="control-card-title text-cyan">
-          <MapPin size={18} /> 2D Underground Mine Map & Location System
-        </div>
-        <div className="d-flex align-items-center gap-1">
-          <span className="badge bg-dark border border-secondary text-info font-monospace small me-1">
-            LOCAL MESH (METERS)
-          </span>
-          <button
-            className="btn btn-sm btn-dark border-secondary text-light min-touch-target p-2"
-            onClick={() => setZoom(prev => Math.min(2.0, prev + 0.2))}
-            aria-label="Zoom in map"
-          >
-            <ZoomIn size={16} />
-          </button>
-          <button
-            className="btn btn-sm btn-dark border-secondary text-light min-touch-target p-2"
-            onClick={() => setZoom(prev => Math.max(0.6, prev - 0.2))}
-            aria-label="Zoom out map"
-          >
-            <ZoomOut size={16} />
-          </button>
-          <button
-            className="btn btn-sm btn-dark border-secondary text-light min-touch-target p-2"
-            onClick={() => setZoom(1.0)}
-            aria-label="Reset map zoom"
-          >
-            <RotateCcw size={16} />
-          </button>
-        </div>
-      </div>
-
-      {/* Screen Reader ARIA Live Location Region */}
-      <div className="visually-hidden" aria-live="polite">
-        Rover position updated: {tunnelId}, X: {locX} meters, Y: {locY} meters.
-      </div>
-
-      <div className="mine-map-container" style={{ width: '100%', height: '310px' }}>
-        <canvas ref={canvasRef} width={680} height={310} style={{ width: '100%', height: '100%' }} aria-label="Underground Mine Interactive Map Canvas" />
-
-        <div className="position-absolute bottom-0 start-0 p-2 m-2 rounded bg-dark border border-secondary text-light font-monospace" style={{ fontSize: '0.78rem', backdropFilter: 'blur(6px)', opacity: 0.9 }}>
-          <div className="d-flex align-items-center gap-3">
-            <span className="d-flex align-items-center gap-1">
-              <span className="status-indicator online"></span> Rover Position
-            </span>
-            <span className="d-flex align-items-center gap-1">
-              <span className="badge bg-danger rounded-circle p-1"></span> Gas/Heat Hazard
-            </span>
-            <span className="d-flex align-items-center gap-1">
-              <span className="badge bg-info rounded-circle p-1"></span> Trapped Worker
-            </span>
+        <div className="control-card-title text-white">
+          <div className="icon-box-emerald" style={{ width: '28px', height: '28px', borderRadius: '8px' }}>
+            <MapPin size={15} className="text-emerald" />
           </div>
+          {t('mineMapTitle')}
         </div>
+        <div className="btn-group btn-group-sm">
+          <button
+            className="btn btn-codespot-secondary btn-sm"
+            onClick={() => setZoom(z => Math.min(z + 0.2, 2.0))}
+            aria-label="Zoom in on 2D mine map"
+            style={{ borderRadius: '6px 0 0 6px', padding: '4px 10px' }}
+          >
+            <ZoomIn size={14} />
+          </button>
+          <button
+            className="btn btn-codespot-secondary btn-sm"
+            onClick={() => setZoom(z => Math.max(z - 0.2, 0.6))}
+            aria-label="Zoom out on 2D mine map"
+            style={{ padding: '4px 10px' }}
+          >
+            <ZoomOut size={14} />
+          </button>
+          <button
+            className="btn btn-codespot-secondary btn-sm"
+            onClick={() => setZoom(1.0)}
+            aria-label="Reset zoom on 2D mine map"
+            style={{ borderRadius: '0 6px 6px 0', padding: '4px 10px' }}
+          >
+            <RotateCcw size={14} />
+          </button>
+        </div>
+      </div>
+
+      <div className="mine-map-container" style={{ height: '250px' }}>
+        <canvas
+          ref={canvasRef}
+          width={400}
+          height={250}
+          className="w-100 h-100 d-block"
+        />
+      </div>
+
+      <div className="d-flex align-items-center justify-content-between mt-2 font-monospace small text-muted">
+        <span className="d-flex align-items-center gap-1.5">
+          <span className="status-indicator online"></span>
+          ROVER-01 (Sector 4)
+        </span>
+        <span className="text-emerald">Grid: 1m/px</span>
       </div>
     </div>
   );

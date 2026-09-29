@@ -1,29 +1,42 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
 @import 'bootstrap-icons/font/bootstrap-icons.css';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&family=Sora:wght@400;600;700;800&display=swap');
 
 :root {
-  --bg-primary: #0a0d14;
-  --bg-secondary: #121824;
-  --bg-card: #161e2e;
-  --bg-card-hover: #1c263b;
-  --border-color: #26334d;
-  --text-primary: #f0f4f8;
-  --text-secondary: #8a99ad;
-  /* WCAG AA compliant text-muted (contrast ratio 4.8:1 on #161e2e) */
-  --text-muted: #8a9ebc;
+  /* Codespot Theme Color System */
+  --bg-primary: #040507;
+  --bg-secondary: #080a0f;
+  --bg-card: #0c1017;
+  --bg-card-hover: #111722;
+  --bg-card-glass: rgba(12, 16, 23, 0.75);
   
-  --accent-cyan: #00f0ff;
-  --accent-blue: #2f80ed;
-  --accent-amber: #ffb703;
-  --accent-red: #ff3b30;
-  --accent-green: #00e676;
-  --accent-purple: #9d4edd;
+  --border-color: rgba(255, 255, 255, 0.09);
+  --border-color-hover: rgba(34, 197, 94, 0.4);
+  --border-color-active: #22c55e;
   
-  --shadow-glow-cyan: 0 0 15px rgba(0, 240, 255, 0.25);
-  --shadow-glow-red: 0 0 20px rgba(255, 59, 48, 0.35);
-  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.4);
+  --text-primary: #ffffff;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  
+  /* Codespot Vibrant Emerald & Mint Accents */
+  --accent-green: #22c55e;
+  --accent-emerald: #10b981;
+  --accent-mint: #4ade80;
+  --accent-lime: #86efac;
+  --accent-dark-green: #14532d;
+  --accent-amber: #f59e0b;
+  --accent-red: #ef4444;
+  --accent-cyan: #22c55e;
+  --accent-blue: #38bdf8;
+  --accent-purple: #a855f7;
+  
+  --shadow-glow-green: 0 0 30px rgba(34, 197, 94, 0.35);
+  --shadow-glow-amber: 0 0 20px rgba(245, 158, 11, 0.3);
+  --shadow-glow-red: 0 0 25px rgba(239, 68, 68, 0.4);
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.75);
+  --shadow-card-hover: 0 16px 40px -10px rgba(34, 197, 94, 0.25), 0 0 1px 1px rgba(34, 197, 94, 0.35);
 
-  /* Spacing Scale System with Coarse Density Parameter */
+  /* Spacing Scale */
   --p-density: 1;
   --space-3xs: calc(2px * var(--p-density, 1));
   --space-2xs: calc(4px * var(--p-density, 1));
@@ -36,30 +49,40 @@
 
 body {
   background-color: var(--bg-primary);
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(34, 197, 94, 0.12) 0%, transparent 60%),
+    radial-gradient(circle at 10% 30%, rgba(16, 185, 129, 0.05) 0%, transparent 40%),
+    radial-gradient(circle at 90% 70%, rgba(34, 197, 94, 0.06) 0%, transparent 50%);
+  background-attachment: fixed;
   color: var(--text-primary);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   margin: 0;
   padding: 0;
   overflow-x: hidden;
 }
 
+h1, h2, h3, h4, h5, h6, .brand-font {
+  font-family: 'Outfit', 'Sora', sans-serif;
+  letter-spacing: -0.02em;
+}
+
 /* Scrollbar styling */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
 }
 ::-webkit-scrollbar-track {
   background: var(--bg-primary);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-blue);
+  background: var(--accent-green);
 }
 
-/* Accessible Touch Targets (44x44px Minimum Sizing) */
+/* Accessible Touch Targets */
 .min-touch-target {
   min-width: 44px;
   min-height: 44px;
@@ -68,40 +91,137 @@ body {
   justify-content: center;
 }
 
-/* Card aesthetics */
+/* Codespot Emerald Cards */
 .control-card {
   background-color: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 10px;
+  border-radius: 16px;
   box-shadow: var(--shadow-card);
   padding: var(--space-md);
-  transition: all 0.25s ease-in-out;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.28s ease;
 }
+
+.control-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(34, 197, 94, 0.4), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
 .control-card:hover {
-  border-color: #3b4d73;
+  transform: translateY(-4px);
+  border-color: var(--border-color-hover);
+  box-shadow: var(--shadow-card-hover);
+  background-color: var(--bg-card-hover);
+}
+
+.control-card:hover::before {
+  opacity: 1;
 }
 
 .control-card-header {
-  background: rgba(18, 24, 36, 0.8);
+  background: rgba(8, 10, 15, 0.85);
   border-bottom: 1px solid var(--border-color);
   padding: var(--space-sm) var(--space-md);
-  border-top-left-radius: 9px;
-  border-top-right-radius: 9px;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
 .control-card-title {
-  font-size: 0.95rem;
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.05rem;
   font-weight: 700;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
+  letter-spacing: -0.01em;
   color: var(--text-primary);
   margin: 0;
   display: flex;
   align-items: center;
   gap: var(--space-xs);
+}
+
+/* Codespot Green Accents & Utility Colors */
+.text-cyan, .text-info, .text-emerald {
+  color: #22c55e !important;
+}
+
+.border-cyan, .border-emerald {
+  border-color: #22c55e !important;
+}
+
+/* Codespot Pill Buttons */
+.btn-codespot-primary, .btn-cyan, .btn-success {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
+  color: #040804 !important;
+  font-weight: 700 !important;
+  border: 1px solid #4ade80 !important;
+  border-radius: 9999px !important;
+  padding: 10px 24px !important;
+  font-family: 'Outfit', sans-serif !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3) !important;
+}
+
+.btn-codespot-primary:hover, .btn-cyan:hover, .btn-cyan:focus, .btn-success:hover {
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%) !important;
+  transform: translateY(-2px) scale(1.02) !important;
+  box-shadow: 0 8px 25px rgba(34, 197, 94, 0.55) !important;
+  color: #000000 !important;
+}
+
+.btn-codespot-primary:active, .btn-cyan:active {
+  transform: translateY(1px) scale(0.98) !important;
+}
+
+.btn-codespot-secondary, .btn-outline-info, .btn-outline-light {
+  background: rgba(255, 255, 255, 0.04) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 9999px !important;
+  font-weight: 600 !important;
+  padding: 10px 22px !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.btn-codespot-secondary:hover, .btn-outline-info:hover, .btn-outline-light:hover {
+  background: rgba(34, 197, 94, 0.12) !important;
+  border-color: #22c55e !important;
+  color: #4ade80 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 18px rgba(34, 197, 94, 0.25) !important;
+}
+
+/* Codespot Icon Container Box */
+.icon-box-emerald {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #22c55e;
+  transition: all 0.3s ease;
+}
+
+.control-card:hover .icon-box-emerald {
+  background: rgba(34, 197, 94, 0.22);
+  border-color: #22c55e;
+  transform: scale(1.08) rotate(3deg);
+  box-shadow: 0 0 16px rgba(34, 197, 94, 0.35);
 }
 
 /* Status Indicators & Pulsing LEDs */
@@ -110,6 +230,7 @@ body {
   width: 10px;
   height: 10px;
   border-radius: 50%;
+  transition: all 0.3s ease;
 }
 .status-indicator.online {
   background-color: var(--accent-green);
@@ -123,7 +244,7 @@ body {
 }
 .status-indicator.critical {
   background-color: var(--accent-red);
-  box-shadow: 0 0 12px var(--accent-red);
+  box-shadow: 0 0 14px var(--accent-red);
   animation: pulse-red 1s infinite;
 }
 .status-indicator.offline {
@@ -131,90 +252,137 @@ body {
 }
 
 @keyframes pulse-green {
-  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.7); }
-  70% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(0, 230, 118, 0); }
-  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 230, 118, 0); }
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+  70% { transform: scale(1.15); box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+@keyframes pulse-amber {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+  70% { transform: scale(1.15); box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
 }
 @keyframes pulse-red {
-  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.8); }
-  70% { transform: scale(1.15); box-shadow: 0 0 0 10px rgba(255, 59, 48, 0.8); }
-  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); }
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.8); }
+  70% { transform: scale(1.2); box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
 
-/* Motion Sensitivity Preference Override */
-@media (prefers-reduced-motion: reduce) {
-  .status-indicator.online,
-  .status-indicator.warning,
-  .status-indicator.critical,
-  .animate__animated {
-    animation: none !important;
-    transition: none !important;
-  }
-}
-
-/* Custom Tactical Badges */
+/* Badges */
 .badge-tactical {
-  font-family: monospace;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 0.78rem;
   letter-spacing: 0.5px;
-  padding: 4px 8px;
-  border-radius: 4px;
+  padding: 6px 12px;
+  border-radius: 9999px;
   font-weight: 600;
+  transition: all 0.25s ease;
 }
-.badge-safe { background: rgba(0, 230, 118, 0.15); color: var(--accent-green); border: 1px solid rgba(0, 230, 118, 0.4); }
-.badge-warning { background: rgba(255, 183, 3, 0.15); color: var(--accent-amber); border: 1px solid rgba(255, 183, 3, 0.4); }
-.badge-critical { background: rgba(255, 59, 48, 0.15); color: var(--accent-red); border: 1px solid rgba(255, 59, 48, 0.4); }
-.badge-info { background: rgba(0, 240, 255, 0.15); color: var(--accent-cyan); border: 1px solid rgba(0, 240, 255, 0.4); }
+.badge-safe { 
+  background: rgba(34, 197, 94, 0.15); 
+  color: #4ade80; 
+  border: 1px solid rgba(34, 197, 94, 0.35); 
+}
+.badge-safe:hover {
+  background: rgba(34, 197, 94, 0.25);
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.3);
+}
+.badge-warning { 
+  background: rgba(245, 158, 11, 0.15); 
+  color: #fbbf24; 
+  border: 1px solid rgba(245, 158, 11, 0.4); 
+}
+.badge-critical { 
+  background: rgba(239, 68, 68, 0.2); 
+  color: #f87171; 
+  border: 1px solid rgba(239, 68, 68, 0.6); 
+}
+.badge-info { 
+  background: rgba(34, 197, 94, 0.15); 
+  color: #4ade80; 
+  border: 1px solid rgba(34, 197, 94, 0.4); 
+}
 
-/* Navigation Bar */
+/* Codespot Navigation Bar */
 .navbar-control {
-  background-color: rgba(10, 13, 20, 0.95);
-  backdrop-filter: blur(12px);
+  background-color: rgba(4, 5, 7, 0.92);
+  backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border-color);
   padding: var(--space-xs) var(--space-lg);
+  transition: all 0.3s ease;
 }
 
 .nav-link-custom {
   color: var(--text-secondary);
-  font-weight: 500;
-  font-size: 0.9rem;
-  padding: 8px 14px;
-  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.88rem;
+  padding: 8px 16px;
+  border-radius: 9999px;
   text-decoration: none;
-  transition: all 0.2s;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   align-items: center;
-  gap: 6px;
-  min-height: 44px;
+  gap: 8px;
+  min-height: 40px;
 }
-.nav-link-custom:hover, .nav-link-custom.active {
-  color: var(--accent-cyan);
-  background-color: rgba(0, 240, 255, 0.08);
+.nav-link-custom:hover {
+  color: #4ade80;
+  background-color: rgba(34, 197, 94, 0.12);
+  transform: translateY(-1px);
+}
+.nav-link-custom.active {
+  color: #ffffff;
+  background: rgba(34, 197, 94, 0.18);
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  box-shadow: 0 0 15px rgba(34, 197, 94, 0.2);
+}
+
+/* Codespot Stat Callouts & Big Numbers */
+.stat-highlight {
+  font-family: 'Outfit', sans-serif;
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: #22c55e;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  transition: all 0.3s ease;
+}
+
+.control-card:hover .stat-highlight {
+  color: #4ade80;
+  text-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+  transform: scale(1.03);
 }
 
 /* Telemetry Card Metric Value */
 .metric-value {
-  font-size: 1.8rem;
+  font-size: 1.85rem;
   font-weight: 800;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.02em;
   color: var(--text-primary);
-  font-family: 'Consolas', monospace;
+  font-family: 'JetBrains Mono', monospace;
+  transition: all 0.25s ease;
 }
 .metric-unit {
   font-size: 0.9rem;
   color: var(--text-secondary);
-  font-weight: 400;
+  font-weight: 500;
   margin-left: 4px;
 }
 
 /* Canvas Mine Map Container */
 .mine-map-container {
-  background: #06090e;
-  border-radius: 8px;
+  background: #040609;
+  border-radius: 14px;
   position: relative;
   overflow: hidden;
-  border: 1px solid #1a2538;
-  touch-action: none; /* Prevents scroll interference on touch drag surfaces */
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  touch-action: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.mine-map-container:hover {
+  border-color: rgba(34, 197, 94, 0.45);
+  box-shadow: 0 0 25px rgba(34, 197, 94, 0.18);
 }
 
 /* Modal Dark Styling */
@@ -222,35 +390,42 @@ body {
   background-color: var(--bg-card);
   color: var(--text-primary);
   border: 1px solid var(--border-color);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(34, 197, 94, 0.15);
 }
 .modal-header.dark-modal-header {
   border-bottom: 1px solid var(--border-color);
   background-color: var(--bg-secondary);
+  border-top-left-radius: 19px;
+  border-top-right-radius: 19px;
 }
 .modal-footer.dark-modal-footer {
   border-top: 1px solid var(--border-color);
   background-color: var(--bg-secondary);
+  border-bottom-left-radius: 19px;
+  border-bottom-right-radius: 19px;
 }
 .dark-input {
   background-color: var(--bg-secondary) !important;
   border: 1px solid var(--border-color) !important;
+  border-radius: 10px !important;
   color: var(--text-primary) !important;
+  transition: all 0.25s ease !important;
 }
 .dark-input:focus {
-  border-color: var(--accent-cyan) !important;
-  box-shadow: 0 0 8px rgba(0, 240, 255, 0.3) !important;
+  border-color: var(--accent-green) !important;
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.35) !important;
 }
 
 /* JSON Code Viewer */
 .json-viewer {
-  background-color: #05080f;
+  background-color: #030406;
   border: 1px solid var(--border-color);
-  border-radius: 6px;
-  padding: 14px;
-  font-family: 'Fira Code', 'Courier New', monospace;
+  border-radius: 10px;
+  padding: 16px;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 0.85rem;
-  color: #00f0ff;
+  color: #4ade80;
   max-height: 380px;
   overflow-y: auto;
 }
@@ -259,22 +434,75 @@ body {
 .video-stream-box {
   position: relative;
   background-color: #000;
-  border-radius: 6px;
+  border-radius: 12px;
   overflow: hidden;
   height: 220px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.3s ease;
+}
+
+.video-stream-box:hover {
+  border-color: rgba(34, 197, 94, 0.4);
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
 }
 
 .video-overlay-badge {
   position: absolute;
   top: 10px;
   left: 10px;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(4px);
-  padding: 4px 8px;
-  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  padding: 4px 10px;
+  border-radius: 9999px;
   font-size: 0.78rem;
-  font-family: monospace;
+  font-family: 'JetBrains Mono', monospace;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Rover WASD Control Buttons */
+.teleop-btn {
+  background: #0d121b;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  color: #ffffff;
+  font-weight: 700;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.teleop-btn:hover {
+  background: rgba(34, 197, 94, 0.2);
+  border-color: #22c55e;
+  color: #4ade80;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.35);
+}
+
+.teleop-btn:active {
+  transform: translateY(1px) scale(0.95);
+  background: #22c55e;
+  color: #000000;
+}
+
+/* Micro-animations and utility */
+.spin {
+  animation: rotate-spinner 1s linear infinite;
+}
+
+@keyframes rotate-spinner {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Table Hover Effects */
+.table-hover tbody tr {
+  transition: background-color 0.2s ease;
+}
+.table-hover tbody tr:hover {
+  background-color: rgba(34, 197, 94, 0.08) !important;
 }

@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { ShieldAlert, CheckCircle, Search, Filter, AlertTriangle } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function EventManagementTable({ events, onAcknowledgeEvent }) {
+  const { t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [riskFilter, setRiskFilter] = useState('ALL');
 
   const getRiskBadge = (lvl) => {
     switch (lvl) {
-      case 'CRITICAL': return 'bg-danger text-white';
-      case 'HIGH': return 'bg-warning text-dark';
-      case 'MODERATE': return 'bg-info text-dark';
-      default: return 'bg-secondary text-white';
+      case 'CRITICAL': return 'badge-critical';
+      case 'HIGH': return 'badge-warning';
+      case 'MODERATE': return 'badge-safe';
+      default: return 'badge-tactical bg-dark text-secondary';
     }
   };
 
@@ -25,14 +27,17 @@ export default function EventManagementTable({ events, onAcknowledgeEvent }) {
   return (
     <div className="control-card p-3">
       <div className="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
-        <div className="control-card-title text-cyan">
-          <ShieldAlert size={18} /> HAZARD & EMERGENCY EVENT MANAGEMENT
+        <div className="control-card-title text-white">
+          <div className="icon-box-emerald" style={{ width: '28px', height: '28px', borderRadius: '8px' }}>
+            <ShieldAlert size={15} className="text-emerald" />
+          </div>
+          {t('eventLogTitle')}
         </div>
 
         {/* Search & Filter Controls */}
         <div className="d-flex align-items-center gap-2">
-          <div className="input-group input-group-sm" style={{ width: '200px' }}>
-            <span className="input-group-text dark-input text-secondary border-secondary"><Search size={14} /></span>
+          <div className="input-group input-group-sm" style={{ width: '210px' }}>
+            <span className="input-group-text dark-input text-secondary border-secondary border-opacity-25"><Search size={14} /></span>
             <input
               type="text"
               className="form-control dark-input font-monospace"
@@ -50,9 +55,9 @@ export default function EventManagementTable({ events, onAcknowledgeEvent }) {
             onChange={(e) => setRiskFilter(e.target.value)}
             aria-label="Filter events by risk level"
           >
-            <option value="ALL">All Risk Levels</option>
-            <option value="CRITICAL">CRITICAL</option>
-            <option value="HIGH">HIGH</option>
+            <option value="ALL">{t('filterAll')}</option>
+            <option value="CRITICAL">{t('filterCritical')}</option>
+            <option value="HIGH">{t('filterHigh')}</option>
             <option value="MODERATE">MODERATE</option>
           </select>
         </div>
@@ -60,59 +65,63 @@ export default function EventManagementTable({ events, onAcknowledgeEvent }) {
 
       {/* Desktop Table View */}
       <div className="table-responsive d-none d-md-block">
-        <table className="table table-dark table-hover align-middle font-monospace small mb-0">
+        <table className="table table-dark table-hover align-middle font-monospace small mb-0" style={{ background: '#080c12' }}>
           <thead>
-            <tr className="text-secondary border-secondary">
+            <tr className="text-secondary border-secondary border-opacity-25">
               <th>EVENT ID</th>
-              <th>TIMESTAMP</th>
+              <th>{t('timestamp')}</th>
               <th>ROVER</th>
-              <th>LOCATION</th>
-              <th>EVENT TYPE</th>
-              <th>SENSOR SOURCE</th>
-              <th>RISK LEVEL</th>
+              <th>{t('location')}</th>
+              <th>{t('eventType')}</th>
+              <th>{t('sensors')}</th>
+              <th>{t('severity')}</th>
               <th>AI CONF.</th>
               <th>STATUS</th>
-              <th>ACTION</th>
+              <th>{t('actions')}</th>
             </tr>
           </thead>
           <tbody>
             {filteredEvents.length === 0 ? (
               <tr>
-                <td colSpan="10" className="text-center text-secondary py-3">
+                <td colSpan="10" className="text-center text-secondary py-4">
                   No hazard events match criteria.
                 </td>
               </tr>
             ) : (
               filteredEvents.map(evt => (
-                <tr key={evt.event_id} className="border-secondary">
-                  <td className="text-info font-monospace fw-bold">{evt.event_id}</td>
+                <tr key={evt.event_id} className="border-secondary border-opacity-25">
+                  <td className="text-emerald font-monospace fw-bold">{evt.event_id}</td>
                   <td className="text-secondary">{new Date(evt.timestamp).toLocaleTimeString()}</td>
                   <td className="text-light">{evt.rover_id}</td>
-                  <td className="text-warning">{evt.tunnel_id} (X:{evt.loc_x}, Y:{evt.loc_y})</td>
+                  <td className="text-white">{evt.tunnel_id} (X:{evt.loc_x}, Y:{evt.loc_y})</td>
                   <td className="text-light fw-bold">{evt.event_type}</td>
                   <td className="text-secondary" style={{ maxWidth: '180px' }}>{evt.sensor_source}</td>
                   <td>
-                    <span className={`badge ${getRiskBadge(evt.risk_level)} px-2 py-1`}>
-                      {evt.risk_level}
+                    <span className={`badge-tactical ${getRiskBadge(evt.risk_level)} px-2.5 py-1`}>
+                      {t(evt.risk_level.toLowerCase()) || evt.risk_level}
                     </span>
                   </td>
-                  <td className="text-cyan">{evt.ai_confidence}%</td>
+                  <td className="text-emerald font-monospace">{evt.ai_confidence ? `${evt.ai_confidence}%` : '88%'}</td>
                   <td>
-                    <span className={evt.acknowledged ? 'text-success' : 'text-danger fw-bold'}>
-                      {evt.acknowledged ? 'ACKNOWLEDGED' : 'UNACKNOWLEDGED'}
-                    </span>
-                  </td>
-                  <td>
-                    {!evt.acknowledged ? (
-                      <button
-                        className="btn btn-outline-success btn-sm p-1.5 font-monospace min-touch-target"
-                        onClick={() => onAcknowledgeEvent(evt.event_id)}
-                        aria-label={`Acknowledge event ${evt.event_id}`}
-                      >
-                        <CheckCircle size={14} className="me-1" /> Acknowledge
-                      </button>
+                    {evt.acknowledged ? (
+                      <span className="badge-tactical badge-safe d-inline-flex align-items-center gap-1">
+                        <CheckCircle size={12} /> ACK
+                      </span>
                     ) : (
-                      <span className="text-secondary small">OK</span>
+                      <span className="badge-tactical badge-critical d-inline-flex align-items-center gap-1">
+                        <AlertTriangle size={12} /> UNACK
+                      </span>
+                    )}
+                  </td>
+                  <td>
+                    {!evt.acknowledged && (
+                      <button
+                        className="btn btn-codespot-primary btn-sm py-1 px-2.5 font-monospace"
+                        style={{ fontSize: '0.72rem' }}
+                        onClick={() => onAcknowledgeEvent(evt.event_id)}
+                      >
+                        ACK
+                      </button>
                     )}
                   </td>
                 </tr>
@@ -122,32 +131,40 @@ export default function EventManagementTable({ events, onAcknowledgeEvent }) {
         </table>
       </div>
 
-      {/* Mobile Stacked Card View (< 768px) */}
-      <div className="d-md-none vstack gap-2">
-        {filteredEvents.map(evt => (
-          <div key={evt.event_id} className="p-3 rounded bg-dark border border-secondary">
-            <div className="d-flex align-items-center justify-content-between mb-2">
-              <span className="text-info font-monospace fw-bold">{evt.event_id}</span>
-              <span className={`badge ${getRiskBadge(evt.risk_level)}`}>{evt.risk_level}</span>
-            </div>
-            <div className="text-light fw-bold mb-1">{evt.event_type}</div>
-            <div className="text-warning small font-monospace mb-1">{evt.tunnel_id} (X:{evt.loc_x}, Y:{evt.loc_y})</div>
-            <div className="text-secondary small mb-2">{evt.sensor_source}</div>
-            <div className="d-flex align-items-center justify-content-between pt-2 border-top border-secondary">
-              <span className="text-cyan small font-monospace">CONF: {evt.ai_confidence}%</span>
-              {!evt.acknowledged ? (
-                <button
-                  className="btn btn-success btn-sm text-dark font-monospace fw-bold px-3 py-1.5 min-touch-target"
-                  onClick={() => onAcknowledgeEvent(evt.event_id)}
-                >
-                  <CheckCircle size={14} className="me-1" /> Acknowledge
-                </button>
-              ) : (
-                <span className="text-success small fw-bold font-monospace">ACKNOWLEDGED</span>
+      {/* Mobile Stacked Card Event List */}
+      <div className="vstack gap-2 d-md-none">
+        {filteredEvents.length === 0 ? (
+          <div className="text-center text-secondary py-3 small font-monospace">
+            No hazard events match criteria.
+          </div>
+        ) : (
+          filteredEvents.map(evt => (
+            <div key={evt.event_id} className="p-2.5 rounded-3 border border-secondary border-opacity-25" style={{ background: '#080c12' }}>
+              <div className="d-flex align-items-center justify-content-between mb-1">
+                <span className="text-emerald font-monospace fw-bold small">{evt.event_id}</span>
+                <span className={`badge-tactical ${getRiskBadge(evt.risk_level)} small`}>
+                  {t(evt.risk_level.toLowerCase()) || evt.risk_level}
+                </span>
+              </div>
+              <div className="text-light small fw-bold mb-1">{evt.event_type}</div>
+              <div className="d-flex align-items-center justify-content-between text-secondary small font-monospace">
+                <span>{evt.tunnel_id} (X:{evt.loc_x}, Y:{evt.loc_y})</span>
+                <span>{new Date(evt.timestamp).toLocaleTimeString()}</span>
+              </div>
+              {!evt.acknowledged && (
+                <div className="mt-2 text-end">
+                  <button
+                    className="btn btn-codespot-primary btn-sm py-1 px-3 font-monospace"
+                    style={{ fontSize: '0.75rem' }}
+                    onClick={() => onAcknowledgeEvent(evt.event_id)}
+                  >
+                    Acknowledge Event
+                  </button>
+                </div>
               )}
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );

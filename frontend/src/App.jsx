@@ -35,7 +35,7 @@ export default function App() {
 
   const wsRef = useRef(null);
 
-  // 1. Initial Telemetry Fetch
+  // 1. Initial & Recurring Telemetry & Event Fetch
   const fetchTelemetry = async () => {
     try {
       if (currentConfig.comm_mode === 'ThingSpeak IoT' && currentConfig.thingspeak_channel_id) {
@@ -51,19 +51,39 @@ export default function App() {
         setTelemetry(res.data);
         setHistory(prev => [...prev.slice(-30), res.data]);
         setBackendConnected(true);
+
+        if (res.data?.ai_risk?.risk_level === 'CRITICAL' && !activeAlert) {
+          setActiveAlert({
+            rover_id: res.data.rover_id || 'ROVER-01',
+            event_type: 'Multimodal AI Hazard Alert: Critical Methane / Thermal Anomaly Detected',
+            location: res.data.location,
+            sensor_source: 'Sensory Gas + Thermal Fusion'
+          });
+        }
+      }
+
+      // Sync latest hazard events
+      const evRes = await api.getEvents();
+      if (evRes.data) {
+        setEvents(evRes.data);
+        const unackCritical = evRes.data.find(e => (e.severity === 'CRITICAL' || e.severity === 'HIGH') && !e.acknowledged);
+        if (unackCritical && !activeAlert) {
+          setActiveAlert(unackCritical);
+        }
       }
     } catch (err) {
       console.warn('Fallback to demo simulation telemetry', err);
       // Fallback demo data
       const res = await api.getRoverData('ROVER-01');
-      setTelemetry(res.data);
-      setHistory(prev => [...prev.slice(-30), res.data]);
+      if (res?.data) {
+        setTelemetry(res.data);
+        setHistory(prev => [...prev.slice(-30), res.data]);
+      }
     }
   };
 
   useEffect(() => {
     fetchTelemetry();
-    api.getEvents().then(res => setEvents(res.data)).catch(() => {});
   }, []);
 
   // 2. Real-Time Polling Loop for ThingSpeak IoT / ESP32
@@ -74,7 +94,7 @@ export default function App() {
     }, intervalSec);
 
     return () => clearInterval(timer);
-  }, [currentConfig.comm_mode, currentConfig.thingspeak_channel_id, currentConfig.thingspeak_read_api_key, currentConfig.refresh_interval]);
+  }, [currentConfig.comm_mode, currentConfig.thingspeak_channel_id, currentConfig.thingspeak_read_api_key, currentConfig.refresh_interval, activeAlert]);
 
   // Handlers
   const handleToggleDemoMode = async () => {

@@ -90,179 +90,150 @@ export default function ConnectRoverModal({ show, onClose, onConfigSaved, curren
   };
 
   return (
-    <div className="modal fade show d-block" tabIndex="-1" role="dialog" aria-labelledby="connectRoverModalTitle" style={{ backgroundColor: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(5px)' }}>
+    <div className="modal fade show d-block" tabIndex="-1" role="dialog" aria-labelledby="connectRoverModalTitle" style={{ backgroundColor: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)' }}>
       <div className="modal-dialog modal-dialog-centered modal-lg" role="document">
-        <div className="modal-content dark-modal border-cyan">
-          <div className="modal-header dark-modal-header border-bottom border-secondary">
-            <h5 className="modal-title text-info d-flex align-items-center gap-2" id="connectRoverModalTitle">
-              <Globe size={20} className="text-cyan" /> Connect Rover to ThingSpeak IoT / ESP32
+        <div className="modal-content dark-modal border-emerald">
+          <div className="modal-header dark-modal-header border-bottom border-secondary border-opacity-25">
+            <h5 className="modal-title text-white d-flex align-items-center gap-2 brand-font" id="connectRoverModalTitle">
+              <div className="icon-box-emerald" style={{ width: '32px', height: '32px', borderRadius: '8px' }}>
+                <Globe size={18} className="text-emerald" />
+              </div>
+              Connect Rover to ThingSpeak IoT / ESP32
             </h5>
             <button type="button" className="btn-close btn-close-white" onClick={onClose} aria-label="Close modal"></button>
           </div>
-          
-          <div className="modal-body p-4">
-            <p className="text-secondary small mb-3">
-              Connect your website directly to your <strong>ThingSpeak IoT channel</strong> or physical <strong>ESP32 Rover</strong> to receive live underground telemetry data.
-            </p>
 
+          <div className="modal-body p-4">
             {testStatus && (
-              <div className={`alert ${testStatus.success ? 'alert-success bg-dark text-success border-success' : 'alert-danger bg-dark text-danger border-danger'} p-2.5 mb-3 font-monospace small d-flex align-items-center gap-2`} role="alert">
-                {testStatus.success ? <CheckCircle size={16} /> : <AlertTriangle size={16} />}
-                {testStatus.message}
+              <div className={`alert ${testStatus.success ? 'alert-success bg-dark text-success border-success' : 'alert-danger bg-dark text-danger border-danger'} d-flex align-items-center gap-2 small font-monospace mb-4 rounded-3`}>
+                {testStatus.success ? <CheckCircle size={18} /> : <AlertTriangle size={18} />}
+                <div>{testStatus.message}</div>
               </div>
             )}
 
             <div className="row g-3">
+              {/* Communication Mode Selection */}
               <div className="col-md-6">
-                <label htmlFor="comm_mode_select" className="form-label text-secondary small fw-bold">Connection Mode</label>
+                <label className="form-label text-secondary small fw-bold">Telemetry Protocol</label>
                 <select
-                  id="comm_mode_select"
+                  className="form-select dark-input font-monospace text-emerald fw-bold"
                   name="comm_mode"
-                  className="form-select dark-input font-monospace text-cyan fw-bold"
                   value={formData.comm_mode}
                   onChange={handleChange}
-                  aria-label="Connection Mode"
                 >
-                  <option value="ThingSpeak IoT">🌐 ThingSpeak IoT Platform (Channel API)</option>
-                  <option value="REST API">📡 Direct ESP32 IP / REST API</option>
-                  <option value="Simulation">🧪 Demo / Simulation Mode</option>
+                  <option value="ThingSpeak IoT">ThingSpeak IoT (Cloud Channel)</option>
+                  <option value="WiFi AP / HTTP REST">ESP32 WiFi Local REST API</option>
+                  <option value="MQTT">MQTT Broker (Mine Mesh)</option>
+                  <option value="Simulation">Built-in AI Simulation Loop</option>
                 </select>
               </div>
 
+              {/* Rover ID */}
               <div className="col-md-6">
-                <label htmlFor="rover_id_input" className="form-label text-secondary small fw-bold">Rover Name / ID</label>
+                <label className="form-label text-secondary small fw-bold">Rover Identifier</label>
                 <input
-                  id="rover_id_input"
                   type="text"
-                  name="rover_id"
                   className="form-control dark-input font-monospace"
+                  name="rover_id"
                   value={formData.rover_id}
                   onChange={handleChange}
-                  aria-label="Rover Name or ID"
+                  placeholder="e.g. ROVER-01"
                 />
               </div>
 
+              {/* Conditional Fields based on Comm Mode */}
               {formData.comm_mode === 'ThingSpeak IoT' ? (
                 <>
                   <div className="col-md-6">
-                    <label htmlFor="thingspeak_channel_input" className="form-label text-info small fw-bold">ThingSpeak Channel ID *</label>
+                    <label className="form-label text-secondary small fw-bold">ThingSpeak Channel ID</label>
                     <input
-                      id="thingspeak_channel_input"
                       type="text"
+                      className="form-control dark-input font-monospace text-emerald fw-bold"
                       name="thingspeak_channel_id"
-                      className="form-control dark-input font-monospace border-info text-info fw-bold"
-                      placeholder="e.g. 2481092"
                       value={formData.thingspeak_channel_id}
                       onChange={handleChange}
-                      aria-label="ThingSpeak Channel ID"
+                      placeholder="e.g. 2481092"
                     />
-                    <div className="text-muted small mt-1" style={{ fontSize: '0.75rem' }}>
-                      Enter your public or private ThingSpeak Channel ID.
-                    </div>
                   </div>
 
                   <div className="col-md-6">
-                    <label htmlFor="thingspeak_key_input" className="form-label text-secondary small fw-bold">ThingSpeak Read API Key (Optional)</label>
+                    <label className="form-label text-secondary small fw-bold">Read API Key</label>
                     <input
-                      id="thingspeak_key_input"
                       type="text"
-                      name="thingspeak_read_api_key"
                       className="form-control dark-input font-monospace"
-                      placeholder="Optional for public channels"
+                      name="thingspeak_read_api_key"
                       value={formData.thingspeak_read_api_key}
                       onChange={handleChange}
-                      aria-label="ThingSpeak Read API Key"
+                      placeholder="Optional for public channels"
                     />
                   </div>
                 </>
               ) : (
                 <>
                   <div className="col-md-6">
-                    <label htmlFor="esp32_ip_input" className="form-label text-secondary small fw-bold">ESP32 IP Address</label>
+                    <label className="form-label text-secondary small fw-bold">ESP32 IP Address / Host</label>
                     <input
-                      id="esp32_ip_input"
                       type="text"
-                      name="esp32_ip"
                       className="form-control dark-input font-monospace"
+                      name="esp32_ip"
                       value={formData.esp32_ip}
                       onChange={handleChange}
-                      aria-label="ESP32 IP Address"
                     />
                   </div>
-
                   <div className="col-md-6">
-                    <label htmlFor="api_base_url_input" className="form-label text-secondary small fw-bold">API Base URL</label>
+                    <label className="form-label text-secondary small fw-bold">API Base URL</label>
                     <input
-                      id="api_base_url_input"
                       type="text"
-                      name="api_base_url"
                       className="form-control dark-input font-monospace"
+                      name="api_base_url"
                       value={formData.api_base_url}
                       onChange={handleChange}
-                      aria-label="API Base URL"
                     />
                   </div>
                 </>
               )}
 
+              {/* Polling Interval */}
               <div className="col-md-6">
-                <label htmlFor="refresh_interval_input" className="form-label text-secondary small fw-bold">Auto-Refresh Interval (Seconds)</label>
-                <input
-                  id="refresh_interval_input"
-                  type="number"
-                  name="refresh_interval"
-                  className="form-control dark-input font-monospace"
-                  min="1"
-                  max="60"
-                  value={formData.refresh_interval}
-                  onChange={handleChange}
-                  aria-label="Auto-Refresh Interval in seconds"
-                />
-              </div>
-
-              <div className="col-md-6 d-flex align-items-end">
-                <div className="form-check form-switch bg-dark p-2.5 rounded border border-secondary w-100">
+                <label className="form-label text-secondary small fw-bold">Refresh Rate</label>
+                <div className="input-group">
                   <input
-                    className="form-check-input ms-0 me-2"
-                    type="checkbox"
-                    id="demoModeSwitch"
-                    name="is_demo_mode"
-                    checked={formData.is_demo_mode}
+                    type="number"
+                    min="1"
+                    max="60"
+                    className="form-control dark-input font-monospace"
+                    name="refresh_interval"
+                    value={formData.refresh_interval}
                     onChange={handleChange}
-                    aria-label="Fallback Simulation Mode"
                   />
-                  <label className="form-check-label text-light small fw-bold ms-2" htmlFor="demoModeSwitch">
-                    Fallback Simulation Mode
-                  </label>
+                  <span className="input-group-text dark-input text-secondary">seconds</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="modal-footer dark-modal-footer d-flex justify-content-between">
+          <div className="modal-footer dark-modal-footer border-top border-secondary border-opacity-25 d-flex justify-content-between">
             <button
               type="button"
-              className="btn btn-outline-warning btn-sm d-flex align-items-center gap-1 min-touch-target"
+              className="btn btn-codespot-secondary font-monospace"
               onClick={handleTestConnection}
               disabled={loading}
-              aria-label="Test Connection to ThingSpeak or ESP32"
             >
               {loading ? <RefreshCw size={14} className="spin" /> : <Radio size={14} />}
-              Test Connection
+              TEST CONNECTION
             </button>
 
             <div className="d-flex gap-2">
-              <button type="button" className="btn btn-secondary btn-sm min-touch-target" onClick={onClose} aria-label="Cancel">
+              <button type="button" className="btn btn-codespot-secondary" onClick={onClose}>
                 Cancel
               </button>
               <button
                 type="button"
-                className="btn btn-info text-dark fw-bold btn-sm d-flex align-items-center gap-1 min-touch-target"
+                className="btn btn-codespot-primary text-dark font-monospace d-flex align-items-center gap-1"
                 onClick={handleSaveAndConnect}
                 disabled={loading}
-                aria-label="Save Configuration and Connect Rover"
               >
-                <Save size={14} /> Connect Rover
+                <Save size={14} /> SAVE & CONNECT ROVER
               </button>
             </div>
           </div>

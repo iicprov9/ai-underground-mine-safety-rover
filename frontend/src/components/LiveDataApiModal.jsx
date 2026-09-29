@@ -38,12 +38,15 @@ export default function LiveDataApiModal({ show, onClose, telemetryData }) {
   };
 
   return (
-    <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(5px)' }}>
+    <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)' }}>
       <div className="modal-dialog modal-dialog-centered modal-xl">
-        <div className="modal-content dark-modal border-info">
-          <div className="modal-header dark-modal-header border-bottom border-secondary">
-            <h5 className="modal-title text-cyan d-flex align-items-center gap-2">
-              <Terminal size={20} /> Live ESP32 Telemetry Data Read API Monitor
+        <div className="modal-content dark-modal border-emerald">
+          <div className="modal-header dark-modal-header border-bottom border-secondary border-opacity-25">
+            <h5 className="modal-title text-white d-flex align-items-center gap-2 brand-font">
+              <div className="icon-box-emerald" style={{ width: '32px', height: '32px', borderRadius: '8px' }}>
+                <Terminal size={18} className="text-emerald" />
+              </div>
+              Live ESP32 Telemetry Data Read API Monitor
             </h5>
             <button type="button" className="btn-close btn-close-white" onClick={onClose}></button>
           </div>
@@ -52,7 +55,7 @@ export default function LiveDataApiModal({ show, onClose, telemetryData }) {
             <div className="row g-3 mb-3">
               <div className="col-md-3">
                 <label className="form-label text-secondary small fw-bold">HTTP Method</label>
-                <select className="form-select dark-input font-monospace" value={httpMethod} onChange={(e) => setHttpMethod(e.target.value)}>
+                <select className="form-select dark-input font-monospace text-emerald" value={httpMethod} onChange={(e) => setHttpMethod(e.target.value)}>
                   <option value="GET">GET</option>
                   <option value="POST">POST</option>
                 </select>
@@ -90,7 +93,7 @@ export default function LiveDataApiModal({ show, onClose, telemetryData }) {
 
               <div className="col-md-6 d-flex align-items-end gap-2">
                 <button
-                  className="btn btn-cyan btn-sm fw-bold d-flex align-items-center gap-1 text-dark"
+                  className="btn btn-codespot-primary btn-sm fw-bold d-flex align-items-center gap-1.5 text-dark"
                   onClick={handleReadNow}
                   disabled={loading}
                 >
@@ -99,70 +102,35 @@ export default function LiveDataApiModal({ show, onClose, telemetryData }) {
                 </button>
 
                 <button
-                  className={`btn btn-sm d-flex align-items-center gap-1 font-monospace ${streaming ? 'btn-danger' : 'btn-outline-success'}`}
+                  className={`btn btn-sm font-monospace d-flex align-items-center gap-1.5 ${streaming ? 'btn-danger' : 'btn-codespot-secondary'}`}
                   onClick={handleToggleStream}
                 >
-                  {streaming ? <Square size={14} /> : <Play size={14} />}
-                  {streaming ? 'STOP STREAM' : 'START LIVE STREAM'}
-                </button>
-
-                <button
-                  className="btn btn-outline-secondary text-light btn-sm font-monospace"
-                  onClick={handleReadNow}
-                >
-                  TEST API
+                  {streaming ? <Square size={14} /> : <RefreshCw size={14} />}
+                  {streaming ? 'STOP POLLING' : 'START 3s AUTO POLLING'}
                 </button>
               </div>
             </div>
 
-            {/* Response Metadata Bar */}
-            <div className="d-flex align-items-center justify-content-between p-2 rounded bg-dark border border-secondary mb-3 font-monospace small">
-              <div className="d-flex align-items-center gap-3">
-                <span>STATUS: <span className="text-success fw-bold">{lastStatusCode} OK</span></span>
-                <span>LATENCY: <span className="text-info">{lastLatency}ms</span></span>
-                <span>STREAM: <span className={streaming ? 'text-success fw-bold' : 'text-secondary'}>{streaming ? 'ACTIVE (2s interval)' : 'IDLE'}</span></span>
+            {/* Status & Latency Pills */}
+            <div className="d-flex align-items-center gap-3 mb-3 p-2.5 rounded-3 border border-secondary border-opacity-25" style={{ background: '#080c12' }}>
+              <div className="d-flex align-items-center gap-1.5 font-monospace small">
+                <span className="text-secondary">HTTP Status:</span>
+                <span className={`badge-tactical ${lastStatusCode === 200 ? 'badge-safe' : 'badge-critical'}`}>
+                  {lastStatusCode} OK
+                </span>
               </div>
-              <div className="text-secondary">Content-Type: application/json</div>
+              <div className="d-flex align-items-center gap-1.5 font-monospace small">
+                <span className="text-secondary">Latency:</span>
+                <span className="text-emerald fw-bold">{lastLatency} ms</span>
+              </div>
             </div>
 
-            {/* Viewer Tabs */}
-            <ul className="nav nav-tabs border-secondary mb-3">
-              <li className="nav-item">
-                <button
-                  className={`nav-link text-light bg-transparent ${activeTab === 'raw' ? 'active border-info text-info fw-bold' : ''}`}
-                  onClick={() => setActiveTab('raw')}
-                >
-                  <Code size={14} className="me-1" /> Raw JSON Response
-                </button>
-              </li>
-              <li className="nav-item">
-                <button
-                  className={`nav-link text-light bg-transparent ${activeTab === 'processed' ? 'active border-info text-info fw-bold' : ''}`}
-                  onClick={() => setActiveTab('processed')}
-                >
-                  <Database size={14} className="me-1" /> Processed Telemetry Model
-                </button>
-              </li>
-            </ul>
-
-            {/* JSON Content Display */}
+            {/* JSON Output Viewer */}
             <div className="json-viewer">
-              <pre className="m-0">
-                {JSON.stringify(
-                  activeTab === 'raw' 
-                    ? (fetchedData || telemetryData || { message: "Press READ NOW to fetch latest ESP32 packet" })
-                    : (fetchedData?.ai_risk || fetchedData || telemetryData), 
-                  null, 
-                  2
-                )}
+              <pre className="mb-0 text-emerald">
+                {fetchedData ? JSON.stringify(fetchedData, null, 2) : '// Click READ NOW to fetch live telemetry stream'}
               </pre>
             </div>
-          </div>
-
-          <div className="modal-footer dark-modal-footer">
-            <button type="button" className="btn btn-secondary btn-sm" onClick={onClose}>
-              Close Monitor
-            </button>
           </div>
         </div>
       </div>

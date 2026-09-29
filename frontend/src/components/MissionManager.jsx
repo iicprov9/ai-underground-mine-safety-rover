@@ -15,20 +15,23 @@ export default function MissionManager({ mission, onMissionUpdate }) {
   return (
     <div className="control-card p-3">
       <div className="d-flex align-items-center justify-content-between mb-2">
-        <div className="control-card-title text-cyan">
-          <Flag size={18} /> EMERGENCY RECONNAISSANCE MISSION CONTROLLER
+        <div className="control-card-title text-white">
+          <div className="icon-box-emerald" style={{ width: '28px', height: '28px', borderRadius: '8px' }}>
+            <Flag size={15} className="text-emerald" />
+          </div>
+          EMERGENCY RECONNAISSANCE MISSION CONTROLLER
         </div>
-        <span className={`badge ${status === 'ACTIVE' ? 'bg-success text-white' : (status === 'PAUSED' ? 'bg-warning text-dark' : 'bg-secondary text-white')} font-monospace`}>
+        <span className={`badge-tactical ${status === 'ACTIVE' ? 'badge-safe' : (status === 'PAUSED' ? 'badge-warning' : 'badge-safe')}`}>
           {status}
         </span>
       </div>
 
       <div className="row align-items-center g-3">
         <div className="col-md-6">
-          <label className="form-label text-secondary small fw-bold mb-1">Active Mission Name</label>
+          <label className="form-label text-secondary small fw-semibold mb-1">Active Mission Name</label>
           <input
             type="text"
-            className="form-control dark-input font-monospace"
+            className="form-control dark-input font-monospace text-emerald"
             value={missionName}
             onChange={(e) => setMissionName(e.target.value)}
           />
@@ -36,19 +39,19 @@ export default function MissionManager({ mission, onMissionUpdate }) {
 
         <div className="col-md-6 d-flex align-items-end gap-2">
           <button
-            className={`btn btn-sm font-monospace fw-bold d-flex align-items-center gap-1 ${status === 'ACTIVE' ? 'btn-outline-success active' : 'btn-success text-dark'}`}
+            className={`btn btn-sm font-monospace fw-bold d-flex align-items-center gap-1.5 rounded-pill ${status === 'ACTIVE' ? 'btn-codespot-primary text-dark' : 'btn-codespot-secondary'}`}
             onClick={() => handleToggleStatus('ACTIVE')}
           >
             <Play size={14} /> Start Mission
           </button>
           <button
-            className={`btn btn-sm font-monospace fw-bold d-flex align-items-center gap-1 ${status === 'PAUSED' ? 'btn-warning text-dark' : 'btn-outline-warning'}`}
+            className={`btn btn-sm font-monospace fw-bold d-flex align-items-center gap-1.5 rounded-pill ${status === 'PAUSED' ? 'btn-warning text-dark' : 'btn-codespot-secondary'}`}
             onClick={() => handleToggleStatus('PAUSED')}
           >
             <Pause size={14} /> Pause Mission
           </button>
           <button
-            className={`btn btn-sm font-monospace fw-bold d-flex align-items-center gap-1 ${status === 'COMPLETED' ? 'btn-danger text-white' : 'btn-outline-danger'}`}
+            className={`btn btn-sm font-monospace fw-bold d-flex align-items-center gap-1.5 rounded-pill ${status === 'COMPLETED' ? 'btn-danger text-white' : 'btn-codespot-secondary'}`}
             onClick={() => handleToggleStatus('COMPLETED')}
           >
             <Square size={14} /> Complete Mission
