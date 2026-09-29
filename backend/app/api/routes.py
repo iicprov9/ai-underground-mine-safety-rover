@@ -27,6 +27,29 @@ def health_check():
         "timestamp": datetime.utcnow().isoformat() + "Z"
     }
 
+# Compatibility route for general latest telemetry
+@router.get("/telemetry/latest")
+def get_latest_telemetry_compat(rover_id: str = "ROVER-01", db: Session = Depends(get_db)):
+    return get_rover_data(rover_id=rover_id, db=db)
+
+# Compatibility route for ThingSpeak direct polling
+@router.get("/thingspeak/latest")
+def get_thingspeak_latest_compat(
+    channel_id: Optional[str] = Query(None),
+    api_key: Optional[str] = Query(None),
+    field_moisture: Optional[str] = Query(None),
+    field_temp: Optional[str] = Query(None),
+    field_hum: Optional[str] = Query(None),
+    field_tilt: Optional[str] = Query(None),
+    field_raw: Optional[str] = Query(None),
+    db: Session = Depends(get_db)
+):
+    rover_id = f"THINGSPEAK-CH{channel_id}" if channel_id else "ROVER-01"
+    sim_data = simulation_service.generate_telemetry(rover_id)
+    payload = process_and_store_telemetry(db, sim_data, is_demo=True)
+    return payload
+
+
 # 2. Rovers list & status
 @router.get("/rovers")
 def get_rovers(db: Session = Depends(get_db)):
